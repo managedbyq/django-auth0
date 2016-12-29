@@ -35,16 +35,15 @@ class Auth0Backend(object):
         if not user_id:
             raise ValueError(_('user_id can\'t be blank!'))
 
-        # The format of user_id is
-        #    {identity provider id}|{unique id in the provider}
-        # The pipe character is invalid for the django username field
-        # The solution is to replace the pipe with a dash
-        username = user_id.replace('|', '-')
+        email = kwargs.get('email')
 
         try:
-            return UserModel.objects.get(username__iexact=username)
+            return UserModel.objects.get(username__iexact=email)
         except UserModel.DoesNotExist:
-            return UserModel.objects.create(username=username)
+            return UserModel.objects.create(
+                username=email,
+                email=email
+            )
 
     # noinspection PyProtectedMember
     def get_user(self, user_id):
